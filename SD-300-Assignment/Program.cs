@@ -49,6 +49,7 @@ class Monster
     public int Defence { get; set; }
     public int OriginalHealth { get; set; } = 600;
     public int CurrentHealth { get; set; } = 600;
+    public bool Defeated { get; set; } = false;
     public Monster(string name, int strength)
     {
         Name = name;
@@ -101,6 +102,7 @@ static class ArmorList
 }
 static class MonsterList
 {
+    public static int DefeatedCounter { get; set; } = 0;
     public static List<Monster> Monsters { get; set; } = new List<Monster>();
     public static List<Monster> ListMonster(Monster monster)
     {
@@ -121,34 +123,62 @@ class Fight
     public Game Game { get; set; }
     public Hero Hero { get; set; }
     public MainMenu MainMenu { get; set; }
+    public int MonsterIndex { get; set; }
+    public Monster CurrentMonster { get; set; }
+
+    public Monster ChangeMonster(Monster currentMonster)
+    {
+        //Monster newMonster = currentMonster;
+        foreach(Monster monster in MonsterList.Monsters)
+        {
+            if (monster.Defeated)
+            {
+                MonsterList.DefeatedCounter++;
+            }
+            if(monster != currentMonster && !monster.Defeated)
+            {
+                CurrentMonster = monster;
+                Console.WriteLine($"You've killed {currentMonster.Name}!!!");
+                Console.WriteLine($"~~~~~~~~~~~~~~ Get Ready! New Monster is coming!");
+                Console.WriteLine($"NEW MONSTER OPPONENT! : {monster.Name}");
+                //newMonster = monster;
+                break;
+            }
+            //if(MonsterList.DefeatedCounter == MonsterList.Monsters.Count)
+            //{
+            //    MainMenu.PromptMenu();
+            //}
+        }
+        return CurrentMonster;
+    }
+    
+
     public void StartFight()
     {
-        Random randomNum = new Random();
-        int monsterIndex = randomNum.Next(MonsterList.Monsters.Count);
-        Monster currentOpponent = MonsterList.Monsters[monsterIndex];
-
+        this.Hero.CurrentHealth = this.Hero.OriginalHealth;
         Console.WriteLine($"BEGIN FIGHT!");
-        Console.WriteLine($"Your opponent is: {MonsterList.Monsters[monsterIndex].Name}");
-        this.HeroTurn(MonsterList.Monsters[monsterIndex]);
+        Console.WriteLine($"Your opponent is: {CurrentMonster.Name}");
+        this.HeroTurn(CurrentMonster);
 
     }
     public void HeroTurn(Monster monsterOpponent)
     {
+        Monster newMonster = ChangeMonster(monsterOpponent);
         this.Win(monsterOpponent);
         this.Lose(monsterOpponent);
         if(!this.Win(monsterOpponent) && !this.Lose(monsterOpponent))
         {
-            Console.WriteLine($"It's your turn");
-            int damage = Hero.BaseStrength + Hero.EquippedWeapon.Power;
-            monsterOpponent.CurrentHealth -= damage;
+                Console.WriteLine($"It's your turn");
+                int damage = Hero.BaseStrength + Hero.EquippedWeapon.Power;
+                monsterOpponent.CurrentHealth -= damage;
 
-            Console.WriteLine($"{monsterOpponent.Name} has been damaged {damage}");
-            if (monsterOpponent.CurrentHealth <= 0)
-            {
-                monsterOpponent.CurrentHealth = 0;
-            }
-            Console.WriteLine($"It now has {monsterOpponent.CurrentHealth} health");
-            this.MonsterTurn(monsterOpponent);
+                Console.WriteLine($"{monsterOpponent.Name} has been damaged {damage}");
+                if (monsterOpponent.CurrentHealth < 0)
+                {
+                    monsterOpponent.CurrentHealth = 0;
+                }
+                Console.WriteLine($"It now has {monsterOpponent.CurrentHealth} health");
+                this.MonsterTurn(newMonster);
         }
         else
         {
@@ -167,7 +197,7 @@ class Fight
             Hero.CurrentHealth -= damage;
 
             Console.WriteLine($"Ouch! You've been hurt by {damage} damage!");
-            if(Hero.CurrentHealth <= 0)
+            if(Hero.CurrentHealth < 0)
             {
                 Hero.CurrentHealth = 0;
             }
@@ -183,12 +213,22 @@ class Fight
     {
         if(monster.CurrentHealth <= 0)
         {
+            monster.Defeated = true;
             Console.WriteLine($"BAAAAAM!!!! You slayed {monster.Name}!!!");
             Console.WriteLine($"You WON!");
             Hero.Statistics.GamesPlayed++;
             Hero.Statistics.FightsWon++;
-            Game.MainMenu.PromptMenu();
-            return true;
+
+            //ChangeMonster(monster);
+            if (MonsterList.DefeatedCounter == MonsterList.Monsters.Count)
+            {
+                Game.MainMenu.PromptMenu();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         return false;
     }
@@ -209,6 +249,10 @@ class Fight
     {
         Hero = hero;
         Game = game;
+        //MainMenu = Game.MainMenu;
+        Random randomNum = new Random();
+        MonsterIndex = randomNum.Next(MonsterList.Monsters.Count);
+        CurrentMonster = MonsterList.Monsters[MonsterIndex];
     }
 }
 
