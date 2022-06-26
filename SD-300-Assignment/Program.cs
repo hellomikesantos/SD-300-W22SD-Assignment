@@ -444,8 +444,7 @@ class Game
             MainMenu.PromptMenu();
     }
     public Game()
-    {
-        
+    { 
         Hero = new Hero(Stats);
         Hero.Game = this;
         Fight = new Fight(Hero, this);
