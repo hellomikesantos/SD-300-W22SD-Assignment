@@ -24,9 +24,9 @@ class Hero
     public string Name { get; set; }
     public int Coins { get; set; } = 0;
     public int BaseStrength { get; set; } = 70;
-    public int EnhancedStrength { get; set; } = 0;
+    public int EnhancedStrength { get; set; }
     public int BaseDefence { get; set; } = 35;
-    public int EnhancedDefence { get; set; } = 0;
+    public int EnhancedDefence { get; set; } 
     public int OriginalHealth { get; set; } = 600;
     public int CurrentHealth { get; set; } = 600;
     public Inventory Inventory { get; set; }
@@ -49,15 +49,15 @@ class Hero
             switch (Console.ReadKey(true).KeyChar)
             {
                 case 's':
-                    EnhancedStrength = BaseStrength + Coins;
+                    EnhancedStrength += Coins;
                     Coins = 0;
                     Console.WriteLine($"Your strength is now: {EnhancedStrength}");
                     Console.WriteLine($"You now have {Coins} coins");
                     break;
                 case 'd':
-                    EnhancedDefence = BaseDefence + Coins;
+                    EnhancedDefence += Coins;
                     Coins = 0;
-                    Console.WriteLine($"Your strength is now: {EnhancedDefence}");
+                    Console.WriteLine($"Your defence is now: {EnhancedDefence}");
                     Console.WriteLine($"You now have {Coins} coins");
                     break;
                 case 'm':
@@ -76,7 +76,8 @@ class Hero
         EquippedWeapon = WeaponList.Weapons[0];
         EquippedArmor = ArmorList.Armors[0];
         Statistics = statistics;
-        //Inventory = inventory;
+        EnhancedStrength = BaseStrength;
+        EnhancedDefence = BaseDefence;
     }
 }
 class Monster
@@ -402,8 +403,8 @@ class MainMenu
                 break;
             case 'e':
                 Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>> Enhance:");
-                Console.WriteLine($"Your current Base Strength: {Inventory.Hero.BaseStrength}");
-                Console.WriteLine($"Your current Base Defence: {Inventory.Hero.BaseDefence}");
+                Console.WriteLine($"Your current Base Strength: {Inventory.Hero.EnhancedStrength}");
+                Console.WriteLine($"Your current Base Defence: {Inventory.Hero.EnhancedDefence}");
                 Console.WriteLine($"Available Coins: {Inventory.Hero.Coins}");
                 Inventory.Hero.Enhance();
                 PromptMenu();
