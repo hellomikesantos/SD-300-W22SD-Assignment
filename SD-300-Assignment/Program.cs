@@ -37,7 +37,7 @@ class Hero
     {
         if(Coins <= 0)
         {
-            Console.WriteLine("Not enough coins... Gain 10 coins for each fight won.");
+            Console.WriteLine("Not enough coins... Gain coins for each fight won.");
             Game.MainMenu.PromptMenu();
         }
         else
